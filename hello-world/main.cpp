@@ -62,11 +62,12 @@ int main(int argc, char **argv)
             rte_panic("Cannot init EAL\n");
         /* >8 End of initialization of Environment Abstraction Layer */
 
-        /* Launches the function on each lcore. 8< */
-        RTE_LCORE_FOREACH_WORKER(lcore_id) {
-                /* Simpler equivalent. 8< */
+        /**
+         * @brief Once the EAL is initialized, the application is ready to launch a function on an lcore.
+         * lcore_hello() is called on every available lcore.
+         */
+        RTE_LCORE_FOREACH_WORKER(lcore_id){
                 rte_eal_remote_launch(lcore_hello, NULL, lcore_id);
-                /* >8 End of simpler equivalent. */
         }
 
         /* call it on main lcore too */
