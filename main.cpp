@@ -1,67 +1,85 @@
-#include <rte_eal.h>
-#include <rte_lcore.h>
-#include <rte_log.h>
-#include <rte_debug.h>
+/* SPDX-License-Identifier: BSD-3-Clause
+ * Copyright(c) 2010-2014 Intel Corporation
+ */
+
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
 #include <vector>
 #include <string>
+#include <errno.h>
+#include <sys/queue.h>
 
-// Define your own log type
-#define RTE_LOGTYPE_APP RTE_LOGTYPE_USER1
+#include <rte_memory.h>
+#include <rte_launch.h>
+#include <rte_eal.h>
+#include <rte_per_lcore.h>
+#include <rte_lcore.h>
+#include <rte_debug.h>
 
-// Function prototype for lcore_hello
-static int lcore_hello(__rte_unused void *arg);
+/* Launch a function on lcore. 8< */
+static int
+lcore_hello(__rte_unused void *arg)
+{
+        unsigned lcore_id;
+        lcore_id = rte_lcore_id();
+        printf("hello from core %u\n", lcore_id);
+        return 0;
+}
+/* >8 End of launching function on lcore. */
 
+/* Initialization of Environment Abstraction Layer (EAL). 8< */
 int main(int argc, char **argv)
 {
-    std::vector<std::string> args;
+        unsigned lcore_id;
 
-    // If no arguments are passed, use default ones
-    if (argc == 1) {
-        args.push_back("-l");
-        args.push_back("0-3");
-        args.push_back("-n");
-        args.push_back("4");
-    } 
-    else 
-    {
-        for (int i = 1; i < argc; ++i) 
+        std::vector<std::string> args;
+
+        // If no arguments are passed, use default ones
+        if (argc == 1)
         {
-            args.push_back(argv[i]);
+            args.push_back("-l");
+            args.push_back("0-3");
+            args.push_back("-n");
+            args.push_back("4");
         }
-    }
+        else
+        {
+            for (int i = 1; i < argc; ++i)
+            {
+                args.push_back(argv[i]);
+            }
+        }
 
-    std::vector<char*> cstrArgs;
-    for (const auto& arg : args) {
-        cstrArgs.push_back(const_cast<char*>(arg.c_str()));
-    }
+        std::vector<char *> cstrArgs;
+        for (const auto &arg : args)
+        {
+            cstrArgs.push_back(const_cast<char *>(arg.c_str()));
+        }
 
+        int ret = rte_eal_init(cstrArgs.size(), cstrArgs.data());
+        if (ret < 0)
+            rte_panic("Cannot init EAL\n");
+        /* >8 End of initialization of Environment Abstraction Layer */
 
-    int ret = rte_eal_init(cstrArgs.size(), cstrArgs.data());
-    if (ret < 0)
-         rte_panic("Cannot init EAL\n");
+        /* Launches the function on each lcore. 8< */
+        RTE_LCORE_FOREACH_WORKER(lcore_id) {
+                /* Simpler equivalent. 8< */
+                rte_eal_remote_launch(lcore_hello, NULL, lcore_id);
+                /* >8 End of simpler equivalent. */
+        }
 
-    RTE_LOG(INFO, APP, "Hello World!\n");
+        /* call it on main lcore too */
+        lcore_hello(NULL);
+        /* >8 End of launching the function on each lcore. */
 
-    // Use RTE_CALL_MASTER instead of CALL_MASTER
-    rte_eal_mp_remote_launch(lcore_hello, NULL, CALL_MAIN);
-    rte_eal_mp_wait_lcore();
+        rte_eal_mp_wait_lcore();
 
-    return 0;
+        /* clean up the EAL */
+        rte_eal_cleanup();
+
+        return 0;
 }
 
-// Function definition for lcore_hello
-static int lcore_hello(__rte_unused void *arg) {
-    unsigned id = rte_lcore_id();
-    RTE_LOG(INFO, APP, "Hello from lcore %u\n", id);
-    return 0;
-}
-
-/*
-
-sudo code --user-data-dir="~/.vscode-root"
-
-
-*/
-
-
-
+// sudo code --user-data-dir="~/.vscode-root"
+// */
