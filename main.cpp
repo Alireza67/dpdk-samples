@@ -80,6 +80,3 @@ int main(int argc, char **argv)
 
         return 0;
 }
-
-// sudo code --user-data-dir="~/.vscode-root"
-// */

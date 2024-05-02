@@ -61,3 +61,29 @@ In this part, we config NIC for dpdk:
 	> sudo modprobe uio_pci_generic
 	>
 	> lsmod | grep uio_pci_generic
+
+- Now, it's time to assign driver to NIC:
+
+	> ip a
+	>
+	> sudo ip link set ens33 down
+	>
+	> dpdk-devbind.py -s
+	>
+	> sudo dpdk-devbind.py -u 0000:02:01.0
+	>
+	> sudo dpdk-devbind.py -b igb_uio 0000:02:01.0
+	>
+
+- In the last step, we set hugepage:
+
+	> sudo bash -c 'echo 512 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages'
+	>
+	> dpdk-hugepages.py -s
+
+
+# Launch IDE
+
+- Open vscode as sudo:
+  
+	> sudo code --no-sandbox --user-data-dir="~/.vscode-root"
