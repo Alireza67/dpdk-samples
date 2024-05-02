@@ -39,3 +39,25 @@ In this part, we survay how can download and build dpdk.
 	> cd build
 	>
 	> ninja -C build
+
+# Config Network
+
+In this part, we config NIC for dpdk:
+
+- First of all, we install a NIC driver that is compatible with dpdk:
+	
+	> sudo add-apt-repository universe
+	>
+	> sudo apt update
+	>
+	> sudo apt install dpdk-kmods-dkms
+	>
+	> sudo modprobe igb_uio
+	>
+	> lsmod | grep igb_uio
+
+- After that, we load another compatible driver:
+
+	> sudo modprobe uio_pci_generic
+	>
+	> lsmod | grep uio_pci_generic
