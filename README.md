@@ -75,6 +75,13 @@ In this part, we config NIC for dpdk:
 	> sudo dpdk-devbind.py -b igb_uio 0000:02:01.0
 	>
 
+- If we want to return back NIC setting, we should apply below steps:
+
+	> sudo dpdk-devbind.py -u 0000:02:01.0
+	>
+	> sudo dpdk-devbind.py -b e1000 0000:02:01.0
+
+
 - In the last step, we set hugepage:
 
 	> sudo bash -c 'echo 512 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages'
