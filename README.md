@@ -41,9 +41,18 @@ In this part, we survay how can download and build dpdk.
 	> ninja -C build
 
 - Compiler and Linker Flags:
+	- Set the pkgconfig path to the PKG_CONFIG_PATH environment variable. The path can be found running the following command.
+		> meson configure
+
+		-  The meson configure output as shown in the following example:
+
+			>   prefix   ====>     /usr/local
+			>
+			>	libdir   ===> lib/x86_64-linux-gnu
+
 	- This command sets the PKG_CONFIG_PATH environment variable to include the directory /usr/local/lib64/pkgconfig/. This is necessary because pkg-config uses this variable to find .pc files, which contain the necessary information for compiling and linking against a library.
 
-		> export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig/
+		> export PKG_CONFIG_PATH=/usr/local/lib/x86_64-linux-gnu/pkgconfig/
 	
 	- This command uses pkg-config to output the compiler flags that are necessary for compiling a program that uses the DPDK library. If you're using gcc to compile your program, you might use a command like gcc $(pkg-config --cflags libdpdk) -o myprogram myprogram.c.
 
