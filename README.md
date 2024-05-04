@@ -40,6 +40,30 @@ In this part, we survay how can download and build dpdk.
 	>
 	> ninja -C build
 
+- Compiler and Linker Flags:
+	- This command sets the PKG_CONFIG_PATH environment variable to include the directory /usr/local/lib64/pkgconfig/. This is necessary because pkg-config uses this variable to find .pc files, which contain the necessary information for compiling and linking against a library.
+
+		> export PKG_CONFIG_PATH=/usr/local/lib64/pkgconfig/
+	
+	- This command uses pkg-config to output the compiler flags that are necessary for compiling a program that uses the DPDK library. If you're using gcc to compile your program, you might use a command like gcc $(pkg-config --cflags libdpdk) -o myprogram myprogram.c.
+
+		> pkg-config --cflags libdpdk
+
+	- This command uses pkg-config to output the linker flags that are necessary for linking a program that uses the DPDK library. If you're using gcc to link your program, you might use a command like gcc -o myprogram myprogram.c $(pkg-config --libs libdpdk).
+
+		> pkg-config --libs libdpdk
+
+	- It specifically requests the linker flags for linking the DPDK library statically. 
+
+		> pkg-config --static --libs libdpdk
+
+		- First, compile your source files into object files:
+			> gcc $(pkg-config --cflags libdpdk) -c myprogram.c -o myprogram.o
+
+		- Next, link your object files into an executable:
+			> gcc -o myprogram myprogram.o $(pkg-config --static --libs libdpdk)
+
+
 # Config Network
 
 In this part, we config NIC for dpdk:
