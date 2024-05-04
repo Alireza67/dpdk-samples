@@ -1,31 +1,27 @@
 cmake_minimum_required(VERSION 3.20)
-project(basicfwd)
+project(basicfwd CXX)
 
-# Find DPDK
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(DPDK REQUIRED libdpdk)
 
-# Check for DPDK installation
-if(NOT DPDK_FOUND)
-    message(FATAL_ERROR "DPDK not found")
+if (PKG_CONFIG_FOUND)
+pkg_check_modules(DPDK "libdpdk")
+if (DPDK_FOUND)
+message(STATUS "found dpdk via pkg-config")
+endif()
 endif()
 
-# Add the executable
+pkg_check_modules(DPDK "libdpdk")
+if (DPDK_FOUND)
+  add_definitions(${DPDK_CFLAGS})
+  set(MYDPDK_LIBRARIES -Wl,--whole-archive ${DPDK_LIBRARIES} -lpthread -lnuma -ldl -Wl,--no-whole-archive)
+  include_directories(${DPDK_INCLUDE_DIR})
+  link_libraries(${MYDPDK_LIBRARIES})
+  add_definitions(-DHAVE_DPDK)
+endif(DPDK_FOUND)
+
 add_executable(${PROJECT_NAME} main.cpp)
-
-# Set compile flags and link libraries
-target_compile_options(${PROJECT_NAME} PRIVATE ${DPDK_CFLAGS_OTHER} -DALLOW_EXPERIMENTAL_API)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${DPDK_LIBRARIES})
-
-# Conditional compilation for static and shared builds
-if(BUILD_SHARED_LIBS)
-    set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS ON)
-else()
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${DPDK_LDFLAGS_STATIC}")
-endif()
-
-add_custom_target(${PROJECT_NAME}_clean
-    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/clean.cmake
-    COMMENT "Cleaning build directory..."
-)
-
