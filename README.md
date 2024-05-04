@@ -62,6 +62,13 @@ In this part, we config NIC for dpdk:
 	>
 	> lsmod | grep uio_pci_generic
 
+- For load vfio-pci driver we should run below steps:
+
+	>  echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode 2
+	>
+	> sudo modprobe vfio-pci
+	>
+
 - Now, it's time to assign driver to NIC:
 
 	> ip a
