@@ -178,36 +178,23 @@ main(int argc, char *argv[])
 	unsigned nb_ports;
 	uint16_t portid;
 
-	std::vector<std::string> args;
-
-	// If no arguments are passed, use default ones
+	int ret{};
 	if (argc == 1)
 	{
-		args.push_back("-l"); // The -l option is used to specify the list of cores that the application will use.
-		args.push_back("1");
-		args.push_back("-n"); // The -n option sets the number of memory channels to use. 
-		args.push_back("4");
+		// If no arguments are passed, use default ones
+		char *default_args[] = {argv[0], "-l", "0-3", "-n", "4"};
+		argc = sizeof(default_args) / sizeof(default_args[0]);
+		ret = rte_eal_init(argc, default_args);
 	}
 	else
 	{
-		for (int i = 1; i < argc; ++i)
-		{
-			args.push_back(argv[i]);
-		}
+		ret = rte_eal_init(argc, argv);
 	}
 
-	std::vector<char *> cstrArgs;
-	for (const auto &arg : args)
-	{
-		cstrArgs.push_back(const_cast<char *>(arg.c_str()));
-	}
-
-
-	/* Initializion the Environment Abstraction Layer (EAL). 8< */
-	int ret = rte_eal_init(cstrArgs.size(), cstrArgs.data());
 	if (ret < 0)
+	{
 		rte_exit(EXIT_FAILURE, "Error with EAL initialization\n");
-	/* >8 End of initialization the Environment Abstraction Layer (EAL). */
+	}
 
 	argc -= ret;
 	argv += ret;
