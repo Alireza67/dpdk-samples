@@ -182,7 +182,7 @@ main(int argc, char *argv[])
 	if (argc == 1)
 	{
 		// If no arguments are passed, use default ones
-		char *default_args[] = {argv[0], "-l", "0-3", "-n", "4"};
+		char *default_args[] = {argv[0], "-l", "1", "-n", "4"};
 		argc = sizeof(default_args) / sizeof(default_args[0]);
 		ret = rte_eal_init(argc, default_args);
 	}
@@ -206,7 +206,22 @@ main(int argc, char *argv[])
 
 	/* Creates a new mempool in memory to hold the mbufs. */
 
-	/* Allocates mempool to hold the mbufs. 8< */
+	/**
+	 * @brief  This is a function provided by DPDK to create a pool of memory buffers (mbufs). 
+	 * These buffers are used to store packet data. The function returns a pointer to the created pool.
+	 * @param "name" This is the name of the memory pool. It's a string that can be used for debugging purposes.
+	 * @param "n" This parameter specifies the total number of mbufs that the pool will contain. 
+	 * NUM_MBUFS is the number of mbufs per port, and nb_ports is the number of ports. 
+	 * @param "cache_size" This parameter specifies the size of the per-lcore cache. 
+	 * The cache is used to reduce the overhead of mbuf allocation and deallocation by caching mbufs that are frequently used. 
+	 * The value of MBUF_CACHE_SIZE is typically set to a power of two (e.g., 32, 64, 128) for performance reasons.
+	 * @param "priv_size" This parameter is the private data size. It specifies the size of the private data area in each mbuf.
+	 * In this case, it's set to 0, meaning no additional space is allocated for private data.
+	 * @param "data_room_size"  This parameter specifies the default data buffer size for each mbuf.
+	 * @param "socket_id" This function returns the socket ID of the current lcore. 
+	 * DPDK uses socket IDs to allocate memory from the NUMA node that the lcore is running on. 
+	 * This helps in optimizing memory access patterns for multi-socket systems.
+ 	 */
 	mbuf_pool = rte_pktmbuf_pool_create("MBUF_POOL", NUM_MBUFS * nb_ports,
 		MBUF_CACHE_SIZE, 0, RTE_MBUF_DEFAULT_BUF_SIZE, rte_socket_id());
 	/* >8 End of allocating mempool to hold mbuf. */
