@@ -8,6 +8,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(PkgConfig REQUIRED)
 
+if(PKG_CONFIG_FOUND)
+  set(ENV{PKG_CONFIG_PATH} "/usr/local/lib64/pkgconfig")
+endif()
+pkg_check_modules(DPDK REQUIRED IMPORTED_TARGET libdpdk)
+
 if (PKG_CONFIG_FOUND)
 pkg_check_modules(DPDK "libdpdk")
 if (DPDK_FOUND)
